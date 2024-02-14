@@ -27,7 +27,7 @@ func main() {
 	}
 
 	kbm := rofi.NewKeyboardMenu(actionMap)
-	out, err := kbm.Show()
+	out, err := kbm.DMenu()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -42,11 +42,11 @@ func getTime() string {
 }
 
 func typeIt(text string) {
-	w := wtype.NewWType(wtype.WTypeBuilder{
+	w := wtype.New(wtype.Builder{
 		DelayBetweenKeyStrokes: "5",
 		DelayBeforeKeyStrokes:  "50",
 	})
-	w.Run(strings.TrimSpace(text))
+	w.ShowDMenu(strings.TrimSpace(text))
 }
 
 func getDate() string {
