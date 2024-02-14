@@ -11,4 +11,6 @@ require (
 	mvdan.cc/sh/v3 v3.6.0 // indirect
 )
 
-// replace github.com/alexpfx/linux_wrappers => ../linux_wrappers
+replace github.com/alexpfx/linux_wrappers => ../linux_wrappers
+
+//

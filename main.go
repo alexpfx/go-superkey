@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/alexpfx/linux_wrappers/wrappers/pm"
 	"github.com/alexpfx/linux_wrappers/wrappers/rofi"
 	"github.com/alexpfx/linux_wrappers/wrappers/wtype"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -18,6 +20,10 @@ func main() {
 	actionMap['d'] = rofi.KeyAction{
 		Label:  "Date",
 		Action: getDate,
+	}
+	actionMap['p'] = rofi.KeyAction{
+		Label:  "New Pass",
+		Action: genNewPass,
 	}
 
 	kbm := rofi.NewKeyboardMenu(actionMap)
@@ -40,11 +46,21 @@ func typeIt(text string) {
 		DelayBetweenKeyStrokes: "5",
 		DelayBeforeKeyStrokes:  "50",
 	})
-	w.Run(text)
+	w.Run(strings.TrimSpace(text))
 }
 
 func getDate() string {
 	mmdd := time.Now().Format("02/01")
 	typeIt(mmdd)
 	return mmdd
+}
+
+func genNewPass() string {
+	pmg := pm.NewDefaultMin12()
+	pass, err := pmg.Gen()
+	if err != nil {
+		log.Fatal(err)
+	}
+	typeIt(pass)
+	return pass
 }
