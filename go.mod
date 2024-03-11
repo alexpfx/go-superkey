@@ -2,7 +2,7 @@ module github.com/alexpfx/go-superkey
 
 go 1.21.6
 
-require github.com/alexpfx/linux_wrappers v0.0.8
+require github.com/alexpfx/linux_wrappers v0.0.11
 
 require (
 	github.com/bitfield/script v0.22.0 // indirect

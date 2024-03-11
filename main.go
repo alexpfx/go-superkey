@@ -8,6 +8,7 @@ import (
 	"log"
 	"strings"
 	"time"
+	"os"
 )
 
 func main() {
@@ -26,8 +27,14 @@ func main() {
 		Action: genNewPass,
 	}
 
+	actionMap['c'] = rofi.KeyAction{
+		Label:  "CPF",
+		Action: getCpf,
+	}
+
+
 	kbm := rofi.NewKeyboardMenu(actionMap)
-	out, err := kbm.DMenu()
+	out, err := kbm.Show()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,12 +48,19 @@ func getTime() string {
 	return hhmm
 }
 
+func getCpf() string {
+	cpf := os.Getenv("CPF")
+	typeIt(cpf)
+
+	return cpf
+}
+
 func typeIt(text string) {
 	w := wtype.New(wtype.Builder{
 		DelayBetweenKeyStrokes: "5",
 		DelayBeforeKeyStrokes:  "50",
 	})
-	w.ShowDMenu(strings.TrimSpace(text))
+	w.Type(strings.TrimSpace(text))
 }
 
 func getDate() string {
@@ -54,6 +68,7 @@ func getDate() string {
 	typeIt(mmdd)
 	return mmdd
 }
+
 
 func genNewPass() string {
 	pmg := pm.NewDefaultMin12()
