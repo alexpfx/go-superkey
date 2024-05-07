@@ -1,3 +1,5 @@
+github.com/alexpfx/linux_wrappers v0.0.12 h1:BBfXyw86MckkYhom99kfHusJkwL+fTtb3wLcBuZ/Mro=
+github.com/alexpfx/linux_wrappers v0.0.12/go.mod h1:RNnKUEtdn+xKOC6rIsFMX2hZolJbUIlE74f+zCtz+Go=
 github.com/bitfield/script v0.22.0 h1:LA7QHuEsXMPD52YLtxWrlqCCy+9FOpzNYfsRHC5Gsrc=
 github.com/bitfield/script v0.22.0/go.mod h1:ms4w+9B8f2/W0mbsgWDVTtl7K94bYuZc3AunnJC4Ebs=
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
