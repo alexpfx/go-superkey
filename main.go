@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/alexpfx/linux_wrappers/wrappers/pm"
 	"github.com/alexpfx/linux_wrappers/wrappers/rofi"
 	"github.com/alexpfx/linux_wrappers/wrappers/wtype"
-	"log"
-	"strings"
-	"time"
-	"os"
+	"github.com/alexpfx/linux_wrappers/wrappers/xdtype"
 )
 
 func main() {
@@ -29,9 +31,9 @@ func main() {
 
 	actionMap['c'] = rofi.KeyAction{
 		Label:  "CPF",
+		
 		Action: getCpf,
 	}
-
 
 	kbm := rofi.NewKeyboardMenu(actionMap)
 	out, err := kbm.Show()
@@ -56,11 +58,24 @@ func getCpf() string {
 }
 
 func typeIt(text string) {
-	w := wtype.New(wtype.Builder{
-		DelayBetweenKeyStrokes: "5",
-		DelayBeforeKeyStrokes:  "50",
+	stype := os.Getenv("XDG_SESSION_TYPE")
+	if stype == "wayland" {
+		w := wtype.New(wtype.Builder{
+			DelayBetweenKeyStrokes: "5",
+			DelayBeforeKeyStrokes:  "50",
+		})
+
+		w.Type(strings.TrimSpace(text))
+		return
+	}
+
+	x := xdtype.New(xdtype.Builder{
+		Delay: "50",
+		
 	})
-	w.Type(strings.TrimSpace(text))
+
+	x.Type(strings.TrimSpace(text))
+
 }
 
 func getDate() string {
@@ -68,7 +83,6 @@ func getDate() string {
 	typeIt(mmdd)
 	return mmdd
 }
-
 
 func genNewPass() string {
 	pmg := pm.NewDefaultMin12()
