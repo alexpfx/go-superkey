@@ -30,9 +30,14 @@ func main() {
 	}
 
 	actionMap['c'] = rofi.KeyAction{
-		Label:  "CPF",
-		
+		Label: "CPF",
+
 		Action: getCpf,
+	}
+
+	actionMap['1'] = rofi.KeyAction{
+		Label:  "dd/mm HH:MM",
+		Action: dataHora,
 	}
 
 	kbm := rofi.NewKeyboardMenu(actionMap)
@@ -41,6 +46,13 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println(out)
+}
+
+func dataHora() string {
+	ddmmHHMM := time.Now().Format("02/01 15:04")
+	typeIt(ddmmHHMM)
+
+	return ddmmHHMM
 }
 
 func getTime() string {
@@ -62,7 +74,7 @@ func typeIt(text string) {
 	if stype == "wayland" {
 		w := wtype.New(wtype.Builder{
 			DelayBetweenKeyStrokes: "5",
-			DelayBeforeKeyStrokes:  "50",
+			DelayBeforeKeyStrokes:  "501",
 		})
 
 		w.Type(strings.TrimSpace(text))
@@ -71,7 +83,6 @@ func typeIt(text string) {
 
 	x := xdtype.New(xdtype.Builder{
 		Delay: "50",
-		
 	})
 
 	x.Type(strings.TrimSpace(text))
