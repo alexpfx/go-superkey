@@ -1,0 +1,22 @@
+actions:
+  - key: "1"
+    label: "dd/MM HH:mm:ss"
+    description: "Data e a hora atual"
+    scripts:
+      default: |
+        #!/bin/bash
+        echo "$(date +'%d/%m %H:%M:%S')"
+  - key: "a"
+    label: "Time"
+    description: "Data e a hora atual"
+    scripts:
+      default: |
+        #!/bin/bash
+        echo "$(date +'%H:%M')"
+  - key: "d"
+    label: "Date"
+    description: "Data atual"
+    scripts:
+      default: |
+        #!/bin/bash
+        echo "$(date +'%d:%')"

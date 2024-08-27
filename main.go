@@ -1,43 +1,60 @@
 package main
 
 import (
-	"fmt"
+	_ "embed"
+	"github.com/alexpfx/go-superkey/action"
+	"github.com/alexpfx/go-superkey/util"
+	"github.com/alexpfx/linux_wrappers/wrappers/rofi"
+
+	"gopkg.in/yaml.v3"
+	"io/fs"
 	"log"
 	"os"
-	"strings"
-	"time"
-
-	"github.com/alexpfx/linux_wrappers/wrappers/pm"
-	"github.com/alexpfx/linux_wrappers/wrappers/rofi"
-	"github.com/alexpfx/linux_wrappers/wrappers/wtype"
-	"github.com/alexpfx/linux_wrappers/wrappers/xdtype"
+	"path/filepath"
 )
 
+//go:embed actions/actions.yaml
+var defaultActionFile []byte
+var userConfigDir, _ = os.UserConfigDir()
+var appActionDir = filepath.Join(userConfigDir, "go-superkey", "actions")
+
 func main() {
+	err := util.Init(appActionDir, "actions.yaml", defaultActionFile)
+	if err != nil {
+		log.Fatal(err)
+	}
+	actionFiles, _ := loadActionFiles()
 	actionMap := make(map[rune]rofi.KeyAction)
-	actionMap['a'] = rofi.KeyAction{
-		Label:  "Time",
-		Action: getTime,
-	}
+	for _, filename := range actionFiles {
+		var actF action.ActionsFile
+		data, err := os.ReadFile(filename)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = yaml.Unmarshal(data, &actF)
+		if err != nil {
+			continue
+		}
 
-	actionMap['d'] = rofi.KeyAction{
-		Label:  "Date",
-		Action: getDate,
-	}
-	actionMap['p'] = rofi.KeyAction{
-		Label:  "New Pass",
-		Action: genNewPass,
-	}
+		for _, act := range actF.Actions {
+			if act.Key == "" {
+				continue
+			}
+			actionMap[rune(act.Key[0])] = rofi.KeyAction{
+				Label: act.Label,
+				Action: func() string {
+					sessionType := getSessionType()
+					if cmd, ok := act.Scripts[sessionType]; ok {
+						out := util.BashExec(cmd)
+						return out
+					}
+					cmd := act.Scripts["default"]
+					out := util.BashExec(cmd)
+					return out
+				},
+			}
+		}
 
-	actionMap['c'] = rofi.KeyAction{
-		Label: "CPF",
-
-		Action: getCpf,
-	}
-
-	actionMap['1'] = rofi.KeyAction{
-		Label:  "dd/mm HH:MM",
-		Action: dataHora,
 	}
 
 	kbm := rofi.NewKeyboardMenu(actionMap)
@@ -45,62 +62,28 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(out)
+	util.Typeit(out)
 }
 
-func dataHora() string {
-	ddmmHHMM := time.Now().Format("02/01 15:04")
-	typeIt(ddmmHHMM)
-
-	return ddmmHHMM
+func getSessionType() string {
+	return os.Getenv("XDG_SESSION_TYPE")
 }
 
-func getTime() string {
-	hhmm := time.Now().Format("15:04")
-	typeIt(hhmm)
+func loadActionFiles() ([]string, error) {
+	acts := make([]string, 0)
 
-	return hhmm
-}
-
-func getCpf() string {
-	cpf := os.Getenv("CPF")
-	typeIt(cpf)
-
-	return cpf
-}
-
-func typeIt(text string) {
-	stype := os.Getenv("XDG_SESSION_TYPE")
-	if stype == "wayland" {
-		w := wtype.New(wtype.Builder{
-			DelayBetweenKeyStrokes: "5",
-			DelayBeforeKeyStrokes:  "501",
-		})
-
-		w.Type(strings.TrimSpace(text))
-		return
-	}
-
-	x := xdtype.New(xdtype.Builder{
-		Delay: "50",
+	filepath.WalkDir(appActionDir, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if filepath.Ext(path) == ".yaml" {
+			acts = append(acts, path)
+		}
+		return err
 	})
+	return acts, nil
 
-	x.Type(strings.TrimSpace(text))
-
-}
-
-func getDate() string {
-	mmdd := time.Now().Format("02/01")
-	typeIt(mmdd)
-	return mmdd
-}
-
-func genNewPass() string {
-	pmg := pm.NewDefaultMin12()
-	pass, err := pmg.Gen()
-	if err != nil {
-		log.Fatal(err)
-	}
-	typeIt(pass)
-	return pass
 }
