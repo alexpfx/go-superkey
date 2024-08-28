@@ -1,3 +1,7 @@
 # go-superkey
 
-![image](https://github.com/user-attachments/assets/77eec5ec-f475-4bf0-8d99-fa87a1ad5a53)
+App que permite configurar atalhos rápidos de teclado. 
+
+
+![image](https://github.com/user-attachments/assets/8f5072ca-ec95-491c-a27c-9983c9be532a)
+
