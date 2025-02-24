@@ -19,4 +19,19 @@ actions:
     scripts:
       default: |
         #!/bin/bash
-        echo "$(date +'%d:%')"
+        echo "$(date +'%d/%m')"
+  - key: "2"
+    label: "DateTime"
+    description: "DataTime"
+    scripts:
+      default: |
+        #!/bin/bash
+        echo -e "$(date +'%d/%m %H:%M:%S')\t$(date -d '+1 hour' +'%d/%m %H:%M:%S')" | sed 's/\\t/	/g'
+  - key: "3"
+    label: "MPV"
+    description: "MPV"
+    scripts:
+      default: |
+        #!/bin/bash
+        mpv $(wl-paste)
+

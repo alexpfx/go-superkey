@@ -5,12 +5,16 @@ import (
 	"github.com/alexpfx/go-superkey/action"
 	"github.com/alexpfx/go-superkey/util"
 	"github.com/alexpfx/linux_wrappers/wrappers/rofi"
-
+	"fmt"
 	"gopkg.in/yaml.v3"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
+	
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+	
+	
 )
 
 //go:embed actions/actions.yaml
@@ -19,9 +23,11 @@ var userConfigDir, _ = os.UserConfigDir()
 var appActionDir = filepath.Join(userConfigDir, "go-superkey", "actions")
 
 func main() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+		
 	err := util.Init(appActionDir, "actions.yaml", defaultActionFile)
 	if err != nil {
-		log.Fatal(err)
+		log.Error().Err(err)
 	}
 	actionFiles, _ := loadActionFiles()
 	actionMap := make(map[rune]rofi.KeyAction)
@@ -29,10 +35,11 @@ func main() {
 		var actF action.ActionsFile
 		data, err := os.ReadFile(filename)
 		if err != nil {
-			log.Fatal(err)
+			log.Error().Err(err)
 		}
 		err = yaml.Unmarshal(data, &actF)
 		if err != nil {
+			fmt.Println("unmarshall error", err)
 			continue
 		}
 
@@ -60,9 +67,10 @@ func main() {
 	kbm := rofi.NewKeyboardMenu(actionMap)
 	out, err := kbm.Show()
 	if err != nil {
-		log.Fatal(err)
+		log.Error().Err(err)
 	}
 	util.Typeit(out)
+	fmt.Printf ("saida: %s", out)
 }
 
 func getSessionType() string {

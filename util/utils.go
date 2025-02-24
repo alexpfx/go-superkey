@@ -50,9 +50,11 @@ func Typeit(text string) {
 	}
 
 	x := xdtype.New(xdtype.Builder{
-		Delay: "50",
+		Delay: "150",
 	})
 
-	x.Type(strings.TrimSpace(text))
+	tt := strings.TrimSpace(text)
+	log.Println(tt)
+	x.Type(tt)
 
 }
